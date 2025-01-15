@@ -3,30 +3,35 @@ package main
 import rl "vendor:raylib"
 
 Player :: struct {
-	pos:    rl.Vector2,
-	radius: f32,
-	color:  rl.Color,
-	speed:  f32,
+	pos:          rl.Vector2,
+	rayDir:       rl.Vector2,
+	radius:       f32,
+	moveSpeed:    f32,
+	rotateAmount: f32,
+	color:        rl.Color,
+}
+
+InitPlayer :: proc() -> Player {
+	return {
+		pos = {f32(rl.GetScreenWidth()) / 2, f32(rl.GetScreenHeight() / 2)},
+		rayDir = rl.Vector2{0, -1},
+		radius = 5,
+		moveSpeed = 2,
+		rotateAmount = 0.1,
+		color = rl.GREEN,
+	}
 }
 
 DrawPlayer :: proc(plr: ^Player) {
-	rl.DrawCircle(i32(plr.pos.x), i32(plr.pos.y), plr.radius, plr.color)
+	rl.DrawCircleV(plr.pos, plr.radius, plr.color)
 }
 
 UpdatePlayer :: proc(plr: ^Player) {
-	dir: rl.Vector2
+	move, angle: f32
 
-	if rl.IsKeyDown(.A) {
-		dir.x = -1
-	} else if rl.IsKeyDown(.D) {
-		dir.x = 1
-	}
+	angle = f32(i32(rl.IsKeyDown(.D)) - i32(rl.IsKeyDown(.A))) * plr.rotateAmount
+	move = f32(i32(rl.IsKeyDown(.W)) - i32(rl.IsKeyDown(.S))) * plr.moveSpeed
 
-	if rl.IsKeyDown(.W) {
-		dir.y = -1
-	} else if rl.IsKeyDown(.S) {
-		dir.y = 1
-	}
-
-	plr.pos += rl.Vector2Normalize(dir) * plr.speed
+	plr.rayDir = rl.Vector2Rotate(plr.rayDir, angle)
+	plr.pos += plr.rayDir * move
 }

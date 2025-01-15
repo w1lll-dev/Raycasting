@@ -2,23 +2,32 @@ package main
 
 import rl "vendor:raylib"
 
-WIN_WIDTH :: 1600
-WIN_HEIGHT :: 900
+winWidth, winHeight: i32 : 1600, 900
 
 main :: proc() {
-	rl.InitWindow(WIN_WIDTH, WIN_HEIGHT, "Raycasting")
+	rl.SetConfigFlags({.WINDOW_RESIZABLE})
+	rl.InitWindow(winWidth, winHeight, "Raycasting")
 
 	rl.SetTargetFPS(60)
 
-	plr := Player{{WIN_WIDTH / 2, WIN_HEIGHT / 2}, 10, rl.GREEN, 5}
+	plr := InitPlayer()
 
 	for !rl.WindowShouldClose() {
+
+
 		rl.BeginDrawing()
 		defer rl.EndDrawing()
 
 		rl.ClearBackground(rl.BLACK)
 
+		DrawLevel()
+
 		UpdatePlayer(&plr)
 		DrawPlayer(&plr)
+
+		rayStart, rayEnd := CalculateRayVectors(&plr)
+		DrawRay(rayStart, rayEnd, rl.RED)
 	}
+
+	rl.CloseWindow()
 }
